@@ -31,7 +31,6 @@ Provides an efficient search tool to help users quickly find relevant informatio
 - **A wide range of AI tools**: including but not limited to text generation, language understanding, data analysis and many other AI-related tools.
 - **Large Model Support**: Supports integration with other large AI models to extend the capability and scope of the application.
 
-
 ## Quick Start
 
 ### docker-compose
