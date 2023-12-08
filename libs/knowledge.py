@@ -6,7 +6,12 @@ import os
 knowledge_dictionary = {
     "未选择": "",
     "青少年编程": "codeboy",
+    "初中数学": "hschool_math_learning_db",
     "对数课堂": "logbot",
+    "Mikrotik": "mikrotik_library",
+    "Webix 知识库": "webix_library",
+    "老上海": "laoshanghai",
+    "上海旅游指南": "ShanghaiTravelGuide",
 }
 
 

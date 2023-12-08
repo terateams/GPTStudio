@@ -16,10 +16,6 @@ with st.sidebar:
 
 st.sidebar.markdown("# 知识库搜索")
 
-st.title("知识库搜索")
-st.markdown("> 对已经创建的知识库进行检索， 检索结果包含了主题相关内容以及匹配度。")
-st.divider()
-
 if "knowledge_messages" not in st.session_state.keys():
     st.session_state.knowledge_messages = [{"role": "assistant", "content": "欢迎使用知识库检索， 请输入主题"}]
 
