@@ -8,5 +8,7 @@ fastpub:
 	talkincode/gptstudio:latest .
 	docker push talkincode/gptstudio:latest
 
+updocker:
+	ssh gpts-server "cd /home/master/gpts && sudo docker-compose pull && sudo docker-compose up -d"
 
 .PHONY: clean build
