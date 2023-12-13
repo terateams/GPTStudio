@@ -2,11 +2,13 @@ import streamlit as st
 import os
 import sys
 from dotenv import load_dotenv
+from libs.knowledge import search_knowledge, knowledge_dictionary
+from libs.msal import msal_auth
+from llama_index import VectorStoreIndex, SimpleDirectoryReader
 
 sys.path.append(os.path.abspath('..'))
 load_dotenv()
-from libs.knowledge import search_knowledge, knowledge_dictionary
-from libs.msal import msal_auth
+
 
 # Authenticate the user via the msal_auth() function
 with st.sidebar:
@@ -14,7 +16,9 @@ with st.sidebar:
     if value is None:
         st.stop()
 
-st.sidebar.markdown("# 知识库搜索")
+st.markdown("## 📚 知识库搜索")
+st.markdown("知识库检索，输入主题，检索相关知识。")
+
 
 if "knowledge_messages" not in st.session_state.keys():
     st.session_state.knowledge_messages = [{"role": "assistant", "content": "欢迎使用知识库检索， 请输入主题"}]
@@ -33,9 +37,6 @@ def clear_chat_history():
 
 st.sidebar.button('清除历史', on_click=clear_chat_history)
 
-if collection_value == "":
-    st.warning("请选择知识库")
-    st.stop()
 
 if prompt := st.chat_input("输入检索主题"):
     st.session_state.knowledge_messages.append({"role": "user", "content": prompt})

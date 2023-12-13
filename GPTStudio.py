@@ -19,26 +19,24 @@ def show_page():
     sidebar()
     st.title("🦜GPTStudio")
     st.markdown("""
-GPTStudio is a library of tools based on GPT (Generative Pre-trained Transformer).
-It is designed to provide developers and data scientists with powerful and easy-to-use GPT capabilities.
-It combines knowledge base management, GPT capabilities, and a collection of AI-based tools to make it a powerful and easy-to-use tool for anyone involved in AI and big data.
-making it ideal for any project involving AI and big models.
+GPTStudio 是一个基于 GPT 的工具库。它旨在为开发人员和数据科学家提供强大而易用的 GPT 功能。
+它结合了知识库管理、GPT 功能和一系列基于人工智能的工具，使其成为人工智能和大数据相关人员的强大而易用的工具。
+使其成为涉及人工智能和大模型的任何项目的理想选择。
 
-## Key Features
+### 关键功能
 
-### Knowledge base retrieval:
+#### 知识库检索：
 
-Provides an efficient search tool to help users quickly find relevant information in the knowledge base.
+提供高效的搜索工具，帮助用户快速查找知识库中的相关信息。
 
-### GPT Proficiency Test
-- **Model Capability Testing**: Allows users to test the performance and capability of GPT models with the assistance of the knowledge base.
-- **Real-time Feedback**: Provides real-time feedback to help users understand the response and accuracy of the model.
+#### GPT 能力测试
+- **模型能力测试**： 允许用户在知识库的帮助下测试 GPT 模型的性能和能力。
+- **实时反馈**： 提供实时反馈，帮助用户了解模型的响应和准确性。
 
-### AI Tools Collection
-- **A wide range of AI tools**: including but not limited to text generation, language understanding, data analysis and many other AI-related tools.
-- **Large Model Support**: Supports integration with other large AI models to extend the capability and scope of the application.
+#### 人工智能工具集
+- **广泛的人工智能工具**：包括但不限于文本生成、语言理解、数据分析和许多其他人工智能相关工具。
+- **大型模型支持**： 支持与其他大型人工智能模型集成，以扩展应用程序的能力和范围。
 
-Translated with www.DeepL.com/Translator (free version)
 """)
 
 

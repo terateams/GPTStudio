@@ -31,7 +31,7 @@ page_state.initn_attr("audio_text_source", None)
 # 语音合成内容
 page_state.initn_attr("speech_recode", None)
 
-st.sidebar.markdown("# 🎙️语音转录🎤")
+st.markdown("## 🎙️语音转录🎤")
 
 # 原始语音文本，识别或者上传的内容
 content_box = st.empty()

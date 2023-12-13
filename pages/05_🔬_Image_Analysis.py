@@ -29,7 +29,7 @@ page_state.initn_attr("analysis_result", "")
 
 page_state.initn_attr("input_type", "camera")
 
-st.sidebar.markdown("# 🔬图像分析")
+st.markdown("## 🔬图像分析")
 
 # 图像分析提示输入
 prompt = st.sidebar.text_area("图像分析提示", "识别分析图片内容", height=30)

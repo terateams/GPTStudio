@@ -1,6 +1,8 @@
 import requests
 import os
+import os
 
+import requests
 
 # 定义知识库名称和对应的集合名称
 knowledge_dictionary = {
@@ -30,10 +32,10 @@ def search_knowledge(collection, query):
         "query": query
     }
 
-    response = requests.post(url, headers=headers, json=payload)
-    if response.status_code != 200:
-        return f"Error searching knowledge: {response.text}"
-    data = response.json()
+    _response = requests.post(url, headers=headers, json=payload)
+    if _response.status_code != 200:
+        return f"Error searching knowledge: {_response.text}"
+    data = _response.json()
 
     def fmt(v):
         return f'**Score**: {v["score"]}\n\n{v["content"]}\n\n---\n\n'
