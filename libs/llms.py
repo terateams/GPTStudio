@@ -21,6 +21,49 @@ def openai_streaming(sysmsg, historys: list):
         yield chunk.choices[0].delta
 
 
+def merge_srt(prompt_str):
+    """翻译"""
+    client = OpenAI()
+    messages = [
+        {"role": "system", "content": f"""
+You are an SRT translator who can easily optimize user-entered SRT subtitled content and output optimized SRT subtitled content. 
+
+- Merge disjointed segments together
+- Merge content with indexing and timing corrections
+- The final output is in SRT format, with no non-SRT content and no explanations.
+"""},
+        {"role": "user", "content": prompt_str},
+    ]
+    response = client.chat.completions.create(
+        model="gpt-4-1106-preview",
+        messages=messages,
+        stream=False
+    )
+    return response.choices[0].message.content
+
+
+def translate_srt(prompt_str, language="zh-CN"):
+    """翻译"""
+    client = OpenAI()
+    messages = [
+        {"role": "system", "content": f"""
+You are the SRT translator and translate whatever the user enters directly into {language}. 
+
+- You want to keep the SRT index, time information, and line feeds in their original format.
+- The output is also in standard SRT format
+- There is no extraneous non-SRT content.
+"""},
+        {"role": "user", "content": prompt_str},
+    ]
+    completion = client.chat.completions.create(
+        model="gpt-4-1106-preview",
+        messages=messages,
+        stream=True
+    )
+    for chunk in completion:
+        yield chunk.choices[0].delta
+
+
 # 定义函数来调用 OpenAI GPT-4 Vision API
 def openai_analyze_image(prompt_str, imagefs):
     client = OpenAI()
@@ -88,4 +131,3 @@ The json format template:
         ]
     )
     return response.choices[0].message.content
-

@@ -22,3 +22,6 @@ streamlit-camera-input-live
 llama_index
 chromadb
 requests
+youtube_dl
+pydub
+srt
