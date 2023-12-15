@@ -47,6 +47,11 @@ apps = [
         "remark": "`通过 AI 模型生成图像，包括人脸、动漫人物、风景等`",
         "link": urlencode("Image_Generation"),
     },
+    {
+        "name": "🎬 字幕语音合成",
+        "remark": "`通过 AI 模型合成字幕中的语音内容, 支持多种音色`",
+        "link": urlencode("Subtitles_To_Speech"),
+    },
 ]
 
 cols = st.columns(3)

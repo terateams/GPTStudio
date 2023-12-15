@@ -14,19 +14,25 @@ from libs.session import PageSessionState
 page_state = PageSessionState("subtitles_to_speech")
 
 page_state.initn_attr("srt_content", "")
-page_state.initn_attr("srt_content_target", "")
-page_state.initn_attr("srt_ttl_render_index", 0)
 
 # 设置 Streamlit
-st.title("字幕到语音转换器")
+st.title("🎬 字幕语音合成")
 
 # 上传字幕文件
 uploaded_file = st.file_uploader("上传字幕文件", type=["xml", "ttml", "srt"])
-c0, c1, c2, c3 = st.columns(4)
+col1, col2 = st.columns(2)
+parse_btn = col1.button("解析字幕")
+clear_btn = col2.button("清除字幕")
 audio_box = st.container()
-srt_box = st.empty()
 
-status_bar = st.sidebar.progress(0.0, text="")
+with st.sidebar:
+    sound_role = st.selectbox("选择音色", ["alloy", "echo", "fable", "onyx", "nova", "shimmer"], index=0)
+    status_bar = st.progress(0.0, text="")
+    ttl_button = st.button("合成语音")
+
+if clear_btn:
+    page_state.srt_content = ""
+    st.rerun()
 
 
 # 函数：创建静音音频
@@ -110,11 +116,11 @@ def xml_to_srt(xml_content):
 
 # 函数：生成语音文件并返回 AudioSegment 对象
 @st.cache_data
-def generate_speech_segment(text, voice="nova"):
+def generate_speech_segment(text):
     client = OpenAI()
     response = client.audio.speech.create(
         model="tts-1",
-        voice=voice,
+        voice=sound_role,
         input=text
     )
     # 保存到临时文件并读取为 AudioSegment
@@ -160,7 +166,7 @@ def merge_audio_segments(segments):
     return combined
 
 
-if c0.button("解析字幕"):
+if parse_btn:
     if uploaded_file is not None:
         file_type = uploaded_file.name.split('.')[-1].lower()
         if file_type == 'xml':
@@ -174,17 +180,21 @@ if c0.button("解析字幕"):
             page_state.srt_content = uploaded_file.getvalue().decode()
         else:
             st.error("不支持的文件格式。请上传 XML 或 SRT 文件。")
+    else:
+        st.error("请先上传字幕文件。")
 
 if page_state.srt_content:
-    srt_text = srt_box.text_area("字幕内容，可修改", page_state.srt_content, height=480)
-    if c1.button("更新字幕"):
-        ts = list(srt.parse(srt_text))
-        for i in range(len(ts)):
-            ts[i].index = i + 1
-        page_state.srt_content = srt.compose(ts)
-        st.rerun()
+    with st.form(key='subtitles_to_speech_form'):
+        srt_text = st.text_area("字幕内容，可修改", page_state.srt_content, height=480)
+        form_submit_button = st.form_submit_button(label='更新字幕')
+        if form_submit_button:
+            ts = list(srt.parse(srt_text))
+            for i in range(len(ts)):
+                ts[i].index = i + 1
+            page_state.srt_content = srt.compose(ts)
+            st.rerun()
 
-if c2.button("合成语音"):
+if ttl_button:
     status_bar.progress(0.0, text=f"开始合成音频文件")
     audio_segments = process_srt_and_generate_audio(page_state.srt_content)
 
