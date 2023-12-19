@@ -1,15 +1,21 @@
 import json
-
+import logging
 import streamlit as st
 import sys
 import os
 from dotenv import load_dotenv
+from llama_index.chat_engine.types import ChatMode
 from llama_index.llms import ChatMessage
-from libs.llama_utils import get_llama_memary_index, get_llama_store_index, create_document_index_by_texts
+from libs.llama_utils import get_llama_memary_index, get_llama_store_index, create_document_index_by_texts, \
+    create_document_index_by_files, query_knowledge_data
 from libs.session import PageSessionState
 from llama_index.tools import QueryEngineTool, ToolMetadata, RetrieverTool
 from llama_index.agent import OpenAIAgent
 from libs.prompts import get_content_from
+
+#
+# logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+# logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 sys.path.append(os.path.abspath('..'))
 load_dotenv()
@@ -25,6 +31,13 @@ def get_ragsbot_page(botname):
     page_state.initn_attr("last_user_msg_processed", True)
     # 用于标记流式输出是否结束
     page_state.initn_attr("streaming_end", True)
+
+    resp = query_knowledge_data("Radius", "radiusrfc.chroma.db", "radiusrfc")
+    if resp:
+        for r in resp:
+            st.write(r.get_text())
+            st.write(r.get_embedding())
+
 
     def end_chat_streaming():
         """当停止按钮被点击时执行，用于修改处理标志"""
@@ -46,19 +59,12 @@ def get_ragsbot_page(botname):
             st.write(page_state.chat_prompt)
 
     # 文本类文件上传
-    files = st.sidebar.file_uploader("上传文件",
-                                     type=["txt", "docx", "doc", "pdf", "pptx", "ppt", "xls", "xlsx",
-                                           "epub", "mobi", "md", "py", "js", "html", "css",
-                                           "json", "yaml", "java", "yml", "ini", "toml",
-                                           "csv", "tsv", "xml", "log", "rst", "sh",
-                                           "bat", "ps1", "psm1", "psd1", "ps1xml",
-                                           "pssc", "psrc", ],
-                                     accept_multiple_files=True)
+    files = st.sidebar.file_uploader("上传文件", accept_multiple_files=True)
 
     if st.sidebar.button("索引文件"):
         if files:
-            texts = [f.getvalue() for f in files]
-            create_document_index_by_texts(texts, "ragsbot.chroma.db", "default_collection")
+            create_document_index_by_files(files, "ragsbot.chroma.db", "default_collection")
+            page_state.rags_load = True
 
     for msg in page_state.messages:
         with st.chat_message(msg["role"]):
@@ -69,26 +75,17 @@ def get_ragsbot_page(botname):
         st.stop()
 
     rindex = get_llama_store_index("ragsbot.chroma.db", "default_collection")
-    agent = OpenAIAgent.from_tools(
-        [
-            # QueryEngineTool(
-            #     query_engine=rindex.as_query_engine(similarity_top_k=10),
-            #     metadata=ToolMetadata(
-            #         name=f"radius_index1_{botname}",
-            #         description="Query all questions related to the radius protocol",
-            #     )),
-            RetrieverTool(
-                retriever=rindex.as_retriever(similarity_top_k=3),
-                metadata=ToolMetadata(
-                    name=f"radius_index2_{botname}",
-                    description="Query all questions related to the radius protocol, in detail.",
-                )
-            )
-        ],
-        system_prompt=get_content_from("ragsbot"),
+    agent = rindex.as_chat_engine(
+        chat_mode=ChatMode.CONTEXT,
+        context_prompt="""
+        "You are a chatbot, able to have normal interactions, as well as talk"
+        " about radius tech"
+        "Here are the relevant documents for the context:\n"
+        "{context_str}"
+        "\nInstruction: Use the previous chat history, or the context above, to interact and help the user."
+        """,
         verbose=True
     )
-
     # 用户输入
     if not page_state.last_user_msg_processed:
         st.chat_input("请等待上一条消息处理完毕", disabled=True)
@@ -107,7 +104,10 @@ def get_ragsbot_page(botname):
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 messages = [ChatMessage(role=m["role"], content=m["content"]) for m in page_state.messages[-10:-1]]
-                response = agent.stream_chat(page_state.chat_prompt, chat_history=messages)
+                response = agent.stream_chat(
+                    page_state.chat_prompt,
+                    chat_history=messages,
+                )
                 # 流式输出
                 placeholder = st.empty()
                 full_response = ''

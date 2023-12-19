@@ -8,6 +8,8 @@ from llama_index.storage.storage_context import StorageContext
 from llama_index.vector_stores import ChromaVectorStore
 from llama_index.text_splitter import SentenceSplitter
 from libs import get_data_dir
+from llama_index import download_loader
+from pathlib import Path
 
 
 def get_llama_memary_index(texts: List[str]):
@@ -90,6 +92,15 @@ def create_document_index(srcdir, dbname, collection):
     vindex.insert_nodes(nodes, show_progress=True)
 
 
+def create_document_index_by_files(files: List, dbname, collection):
+    texts = [f.getvalue() for f in files if f.name.split('.')[-1] in ["txt", "md"]]
+    if len(texts) > 0:
+        create_document_index_by_texts(texts, dbname, collection)
+    wordas = [f for f in files if f.name.split('.')[-1] in ["docx", "doc"]]
+    if len(wordas) > 0:
+        create_document_index_by_word(wordas, dbname, collection)
+
+
 def create_document_index_by_texts(texts: List, dbname, collection):
     """
     Create a document index using the given text list, database name, and collection name.
@@ -104,7 +115,7 @@ def create_document_index_by_texts(texts: List, dbname, collection):
 
     """
     # load your documents from a directory
-    documents = [ Document(text=t) for t in texts]
+    documents = [Document(text=t) for t in texts]
     # get an index
     vindex = get_llama_store_index(dbname, collection)
     # define a text splitter
@@ -115,15 +126,49 @@ def create_document_index_by_texts(texts: List, dbname, collection):
     vindex.insert_nodes(nodes, show_progress=True)
 
 
+def create_document_index_by_word(files: List, dbname, collection):
+    DocxReader = download_loader("DocxReader")
+    loader = DocxReader()
+    for file in files:
+        documents = loader.load_data(file=file)
+        # get an index
+        vindex = get_llama_store_index(dbname, collection)
+        # define a text splitter
+        text_splitter = SentenceSplitter(chunk_size=1024, chunk_overlap=10)
+        # process nodes from documents
+        nodes = text_splitter.get_nodes_from_documents(documents, show_progress=True)
+        # insert nodes into index
+        vindex.insert_nodes(nodes, show_progress=True)
+
+
+def query_knowledge_data(query_str, dbname, collection):
+    rindex = get_llama_store_index(dbname, collection)
+    r = rindex.as_retriever(include=["metadatas", "documents", "embeddings"])
+    return r.retrieve(query_str)
+
+
 if __name__ == "__main__":
     from dotenv import load_dotenv
-    load_dotenv(os.path.join(os.path.abspath(".."), ".env"))
-    create_document_index(
-        os.path.join(os.path.abspath("."), "assets/test"),
-        "radiusrfc.chroma.db",
-        "radiusrfc"
-    )
-    index = get_llama_store_index("radiusrfc.chroma.db", "radiusrfc")
-    query = index.as_query_engine()
-    resp = query.query("Radius")
-    print(resp)
+
+    # load_dotenv(os.path.join(os.path.abspath(".."), ".env"))
+    # create_document_index(
+    #     os.path.join(os.path.abspath("."), "assets/test"),
+    #     "radiusrfc.chroma.db",
+    #     "radiusrfc"
+    # )
+    # index = get_llama_store_index("radiusrfc.chroma.db", "radiusrfc")
+    # query = index.as_query_engine()
+    # resp = query.query("Radius")
+    # print(resp)
+    os.environ["DATA_DIR"] = "/Users/wangjuntao/github/GPTStudio/rundata"
+    r = query_knowledge_data("Radius", "radiusrfc.chroma.db", "radiusrfc")
+    print(r)
+    # import chromadb
+    # chroma_client = chromadb.PersistentClient(path=os.path.join(get_data_dir(), "radiusrfc.chroma.db"))
+    # collection = chroma_client.get_or_create_collection(name="radiusrfc")
+    # results = collection.query(
+    #     query_embeddings=OpenAIEmbedding().get_text_embedding_batch(["radius"]),
+    #     n_results=2,
+    #     include=["metadatas", "documents", "embeddings"]
+    # )
+    # print(results)
