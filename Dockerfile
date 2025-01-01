@@ -30,8 +30,6 @@ WORKDIR /gptstudio
 COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
-COPY requirements-news.txt ./requirements-news.txt
-RUN pip install --no-cache-dir -r requirements-news.txt
 
 # 复制项目文件
 COPY ./.streamlit ./.streamlit
