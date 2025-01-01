@@ -34,6 +34,7 @@ RUN pip install -r requirements.txt
 # 复制项目文件
 COPY ./.streamlit ./.streamlit
 COPY ./assets ./assets
+COPY ./common ./common
 COPY ./gptstudio ./gptstudio
 COPY ./assets ./assets
 COPY ./gptstudio.py ./gptstudio.py
