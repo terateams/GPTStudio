@@ -13,3 +13,4 @@ build
 /playground/chroma_db/
 /playground/local_qdrant/
 /libs/rundata/
+env.json

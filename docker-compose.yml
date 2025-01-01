@@ -2,29 +2,22 @@ version: "3"
 services:
   gptstudio:
     container_name: "gptstudio"
-    image: talkincode/gptstudio:latest
+    image: teamsgpt.azurecr.io/gptstudio:latest
     logging:
       driver: "json-file"
       options:
         max-size: "50m"
-    environment:
-        - GPT_SERVICE_ADDRESS=${GPT_SERVICE_ADDRESS}
-        - GPT_SERVICE_TOKEN=${GPT_SERVICE_TOKEN}
-        - OPENAI_API_TYPE=${OPENAI_API_TYPE}
-        - OPENAI_API_KEY=${OPENAI_API_KEY}
-        - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION}
-        - AZURE_OPENAI_API_BASE=${AZURE_OPENAI_API_BASE}
-        - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
-        - MSAL_TENANTID=${MSAL_TENANTID}
-        - MSAL_APPID=${MSAL_APPID}
-        - DATA_DIR=/data
+    env_file:
+      - .env
     volumes:
       - gptstudio-volume:/data
     ports:
-      - "8898:80"
-    command: ["streamlit","run", "/GPTStudio.py"]
+      - "8501:8501"
+    command: ["streamlit","run", "gptstudio.py"]
+    restart: always
     networks:
       gptstudio_network:
+
 
 networks:
   gptstudio_network:

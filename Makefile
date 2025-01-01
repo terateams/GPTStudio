@@ -1,14 +1,13 @@
-arm64:
-	docker buildx build --build-arg GoArch="arm64" --platform=linux/arm64 -t \
-	talkincode/gptstudio:latest-arm64 .
-	docker push talkincode/gptstudio:latest-arm64
-
-fastpub:
+amd64:
 	docker buildx build --build-arg GoArch="amd64" --platform=linux/amd64 -t \
-	talkincode/gptstudio:latest .
-	docker push talkincode/gptstudio:latest
+	teamsgpt.azurecr.io/gptstudio:latest .
+
+pub:
+	docker push teamsgpt.azurecr.io/gptstudio:latest
 
 updocker:
-	ssh gpts-server "cd /home/master/gpts && sudo docker-compose pull && sudo docker-compose up -d"
+	ssh teamsgpt-azure "cd /home/master/gptstudio-deploy && sudo sh upgrade.sh"
+
 
 .PHONY: clean build
+

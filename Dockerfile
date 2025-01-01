@@ -1,5 +1,4 @@
-# 使用 Mambaforge 基础镜像
-FROM condaforge/mambaforge:latest
+FROM python:3.12.8-bookworm
 
 # 设置非交互式前端，避免 apt-get 交互式提示
 ENV DEBIAN_FRONTEND=noninteractive
@@ -11,31 +10,44 @@ RUN echo "Asia/Shanghai" > /etc/timezone && \
     apt-get install -y tzdata && \
     dpkg-reconfigure --frontend noninteractive tzdata
 
-# 安装 Tesseract-OCR、Graphviz、字体以及 FFMPEG
+
 RUN apt-get update && \
-    apt-get install -y tesseract-ocr tesseract-ocr-chi-sim graphviz fonts-wqy-microhei fonts-noto ffmpeg && \
+    apt-get install -y  build-essential ca-certificates libffi-dev libssl-dev libasound2 curl iputils-ping wget && \
+    apt-get install -y  poppler-utils ffmpeg libpq-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# RUN wget -O - https://www.openssl.org/source/openssl-1.1.1u.tar.gz | tar zxf - && \
+#     cd openssl-1.1.1u && \
+#     ./config --prefix=/usr/local && \
+#     make -j $(nproc) && \
+#     make install_sw install_ssldirs && \
+#     ldconfig -v && \
+#     export SSL_CERT_DIR=/etc/ssl/certs
+
 # 设置工作目录
-WORKDIR /app
+WORKDIR /gptstudio
+COPY requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
+
+COPY requirements-news.txt ./requirements-news.txt
+RUN pip install --no-cache-dir -r requirements-news.txt
 
 # 复制项目文件
-COPY ./GPTStudio.py ./GPTStudio.py
-COPY ./pages ./pages
-COPY ./libs ./libs
-COPY ./config.toml ./.streamlit/config.toml
-COPY ./components ./components
-COPY requirements.txt ./requirements.txt
+COPY ./.streamlit ./.streamlit
+COPY ./assets ./assets
+COPY ./gptstudio ./gptstudio
+COPY ./assets ./assets
+COPY ./gptstudio.py ./gptstudio.py
 
-# 安装项目依赖以及 OpenCV
-RUN pip install --no-cache-dir -r requirements.txt
+
+ENV STREAMLIT_SERVER_PORT=8501
+ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
 
 # 暴露 Streamlit 默认端口
 EXPOSE 8501
 
-# 环境变量设置为非缓冲模式，以便实时输出
 ENV PYTHONUNBUFFERED=1
 
 # 设置启动命令
-CMD ["streamlit","run", "GPTStudio.py", "--server.port=8501"]
+CMD ["streamlit","run", "gptstudio.py"]

@@ -1,0 +1,19 @@
+[global]
+showWarningOnDirectExecution = false
+
+[server]
+enableCORS = false
+enableXsrfProtection = false
+
+maxUploadSize = 300
+
+[logger]
+level = 'info'
+
+
+[client]
+showSidebarNavigation = true
+
+[browser]
+gatherUsageStats = false
+
