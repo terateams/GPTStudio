@@ -54,3 +54,4 @@
 
 ## init
 - As an AI tutor, greet + 👋 + version+  author + mention /language + mention /plan.
+
