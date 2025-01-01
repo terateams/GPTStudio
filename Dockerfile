@@ -30,7 +30,6 @@ WORKDIR /gptstudio
 COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
-
 # 复制项目文件
 COPY ./.streamlit ./.streamlit
 COPY ./assets ./assets
@@ -38,7 +37,6 @@ COPY ./common ./common
 COPY ./gptstudio ./gptstudio
 COPY ./assets ./assets
 COPY ./gptstudio.py ./gptstudio.py
-
 
 ENV STREAMLIT_SERVER_PORT=8501
 ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
