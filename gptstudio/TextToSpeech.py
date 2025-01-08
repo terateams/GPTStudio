@@ -29,6 +29,27 @@ with col1:
                 "en-US-AvaMultilingualNeural",
                 "en-US-BrianMultilingualNeural",
                 "en-US-JennyMultilingualNeural",
+                "zh-CN-YunxiNeural",
+                "zh-CN-YunjianNeural",
+                "zh-CN-YunyangNeural",
+                "zh-CN-YunfengNeural",
+                "zh-CN-YunhaoNeural",
+                "zh-CN-YunxiaNeural",
+                "zh-CN-YunyeNeural",
+                "zh-CN-YunzeNeural",
+                "zh-CN-XiaoyiNeural",
+                "zh-CN-XiaochenNeural",
+                "zh-CN-XiaohanNeural",
+                "zh-CN-XiaoxiaoNeural",
+                "zh-CN-XiaomengNeural",
+                "zh-CN-XiaomoNeural",
+                "zh-CN-XiaoqiuNeural",
+                "zh-CN-XiaoruiNeural",
+                "zh-CN-XiaoshuangNeural",
+                "zh-CN-XiaoxuanNeural",
+                "zh-CN-XiaoyanNeural",
+                "zh-CN-XiaoyouNeural",
+                "zh-CN-XiaozhenNeural",
             ],
             index=0,
         )
@@ -54,6 +75,7 @@ def st_generate_speech_segment(
     elif state.speech_type == "openai":
         return generate_openai_speech_segment(text, voice, speed=speed)
 
+
 with col2:
     srt_text = st.text_area("文本内容", state.speech_text, height=270)
     if srt_text:
@@ -61,17 +83,19 @@ with col2:
 
     audio_box = st.container()
 
-
     if ttl_button:
         with st.spinner("生成中..."):
             # 合并音频段
             merged_audio = st_generate_speech_segment(
-                state.speech_text, state.speech_voice, state.language, state.speech_speed
+                state.speech_text,
+                state.speech_voice,
+                state.language,
+                state.speech_speed,
             )
             if merged_audio is None:
                 st.error("生成音频失败！")
                 st.stop()
-                
+
             # 导出为文件
             merged_audio_path = "text_to_speech_final_audio.mp3"
             merged_audio.export(merged_audio_path, format="mp3")

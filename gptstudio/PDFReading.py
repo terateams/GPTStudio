@@ -93,14 +93,17 @@ with col1:
                 continue
             with st.spinner(f"正在识别 PDF 文件 ({file_name}) 内容..."):
                 file_path = os.path.join(output_dir, file_name)
-                content = analyze_document(file_path)
-                st.session_state.markdown_content += f"\n\n{content}\n\n"
-                mdbox.code(content, language="markdown")
-                
-                text_file_path = os.path.join(output_dir, f"{os.path.splitext(file_name)[0]}.txt")
-                with open(text_file_path, 'w', encoding='utf-8') as text_file:
-                    text_file.write(content)
-                st.session_state.markdown_content_files.append(text_file_path)
+                try:
+                    content = analyze_document(file_path)
+                    st.session_state.markdown_content += f"\n\n{content}\n\n"
+                    mdbox.code(content, language="markdown")
+                    
+                    text_file_path = os.path.join(output_dir, f"{os.path.splitext(file_name)[0]}.txt")
+                    with open(text_file_path, 'w', encoding='utf-8') as text_file:
+                        text_file.write(content)
+                    st.session_state.markdown_content_files.append(text_file_path)
+                except Exception as e:
+                    st.error(f"处理文件 {file_name} 时出错: {e}")
 
         # 显示合并后的内容
         if st.session_state.markdown_content:

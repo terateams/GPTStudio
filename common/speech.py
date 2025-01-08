@@ -67,15 +67,7 @@ azure_voices = [
 
 
 def is_ssml(text):
-    try:
-        # 尝试解析文本为 XML
-        ElementTree.fromstring(text)
-        # 如果没有抛出异常，那么这是有效的 XML，可能是 SSML
-        # 这里可以添加更多的检查，例如检查根元素是否是 <speak>
-        return True
-    except ElementTree.ParseError:
-        # 如果解析 XML 时抛出异常，那么这不是有效的 SSML
-        return False
+    return text.endswith("</speak>")
 
 
 def create_silence_audio_segment(duration_milliseconds) -> AudioSegment:
@@ -224,6 +216,8 @@ def generate_azure_speech_segment(
         result = speech_synthesizer.speak_ssml_async(text).get()
     else:
         result = speech_synthesizer.speak_text_async(text).get()
+    
+    # result = speech_synthesizer.speak_ssml_async(text).get()
 
     if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
         print(

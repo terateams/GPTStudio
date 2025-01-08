@@ -14,3 +14,4 @@ build
 /playground/local_qdrant/
 /libs/rundata/
 env.json
+*.mp3
